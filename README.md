@@ -2,8 +2,9 @@
 
 ### Skapa projektet och installera redux + toolkit
 
-1. `npx create-next-app@latest todolist-redux-toolkit`
-2. `npm install @reduxjs/toolkit react-redux`
+1. Navigera till din mapp där du vill ha ditt projekt
+2. Skapa projektet: `npx create-next-app@latest todolist-redux-toolkit`
+3. Installera paket: `npm install @reduxjs/toolkit react-redux`
 
 ## Skapa en Redux slice
 
@@ -47,8 +48,8 @@
 
 - Skapa en fil `store.js` i root
 - Öppna filen:
-  - importera `configureStore` funktionen från `@reduxjs/toolkit`.
-  - importera `todoSlice` reducern
+  - Importera `configureStore` funktionen från `@reduxjs/toolkit`.
+  - Importera `todoSlice` reducern
   - Använd configureStore för att skapa Redux store.
 
 ## Skapa Todo komponenten / filen
