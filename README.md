@@ -49,7 +49,7 @@
 - Skapa en fil `store.js` i root
 - Öppna filen:
   - Importera `configureStore` funktionen från `@reduxjs/toolkit`.
-  - Importera `todoSlice` reducern
+  - Importera `todoSlice` reducern (den kan heta vad du vill)
   - Använd configureStore för att skapa Redux store.
 
 ## Skapa Todo komponenten / filen

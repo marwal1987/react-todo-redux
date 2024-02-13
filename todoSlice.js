@@ -14,15 +14,13 @@ const todoSlice = createSlice({
     },
     toggleComplete: (state, action) => {
       const todo = state.find((todo) => todo.id === action.payload);
-      if (todo) {
-        todo.completed = !todo.completed;
-      }
+      todo && (todo.completed = !todo.completed);
     },
+
     deleteTodo: (state, action) => {
-      const index = state.findIndex((todo) => todo.id === action.payload);
-      if (index !== -1) {
-        state.splice(index, 1);
-      }
+      return state.filter((todo) => {
+        return todo.id !== action.payload;
+      });
     },
   },
 });
