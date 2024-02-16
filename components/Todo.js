@@ -1,53 +1,107 @@
-import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addTodo, toggleComplete, deleteTodo } from "../todoSlice";
+import {
+  addTodo,
+  updateTodo,
+  removeTodo,
+  setTitle,
+  setIsEditing,
+} from "../todoSlice";
+import { SlPlus, SlPencil, SlTrash } from "react-icons/sl";
 
-function Todo() {
-  const [text, setText] = useState("");
-  const todos = useSelector((state) => state.todos);
+export default function Todo() {
+  const { todos, title, isEditing } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
 
-  function handleInputChange(e) {
-    setText(e.target.value);
-  }
-
   function handleAddTodo() {
-    if (text) {
-      dispatch(addTodo(text));
-      setText("");
+    if (title.trim() !== "") {
+      dispatch(
+        addTodo({
+          id: Date.now(),
+          title,
+          done: false,
+        })
+      );
+      dispatch(setTitle(""));
     }
   }
 
-  function handleToggleComplete(id) {
-    dispatch(toggleComplete(id));
+  function handleTitleChange(event) {
+    dispatch(setTitle(event.target.value));
   }
 
-  function handleDeleteTodo(id) {
-    dispatch(deleteTodo(id));
+  function handleToggleEditing() {
+    dispatch(setIsEditing(!isEditing));
+  }
+
+  function handleChangeTodo(updatedTodo) {
+    dispatch(updateTodo(updatedTodo));
+  }
+
+  function handleDeleteTodo(todoId) {
+    dispatch(removeTodo(todoId));
+  }
+
+  function handleSave(todo, newTitle) {
+    dispatch(updateTodo({ ...todo, title: newTitle }));
+    dispatch(setIsEditing(false));
   }
 
   return (
     <div>
-      <input type="text" value={text} onChange={handleInputChange} />{" "}
-      <button onClick={handleAddTodo}> Add Todo </button>
+      <h1>ToDo-list</h1>
+      <div id="addTodo">
+        <input
+          placeholder="Add task"
+          value={title}
+          onChange={handleTitleChange}
+        />
+        <button onClick={handleAddTodo} style={{ color: "goldenrod" }}>
+          <SlPlus />
+        </button>
+      </div>
       <ul>
         {todos.map((todo) => (
-          <li
-            key={todo.id}
-            style={{
-              textDecoration: todo.completed ? "line-through" : "none",
-            }}
-          >
-            {todo.text}
-            <button onClick={() => handleToggleComplete(todo.id)}>
-              {todo.completed ? "Mark Incomplete" : "Mark Complete"}
-            </button>
-            <button onClick={() => handleDeleteTodo(todo.id)}> Delete </button>
+          <li key={todo.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={todo.done}
+                onChange={(e) =>
+                  handleChangeTodo({ ...todo, done: e.target.checked })
+                }
+              />
+              {isEditing ? (
+                <>
+                  <input
+                    type="text"
+                    value={todo.title}
+                    onChange={(e) => handleSave(todo, e.target.value)}
+                  />
+                  <button onClick={() => handleSave(todo, todo.title)}>
+                    Save
+                  </button>
+                </>
+              ) : (
+                <>
+                  {todo.title}
+                  <button
+                    onClick={handleToggleEditing}
+                    style={{ color: "goldenrod" }}
+                  >
+                    <SlPencil />
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => handleDeleteTodo(todo.id)}
+                style={{ color: "red" }}
+              >
+                <SlTrash />
+              </button>
+            </label>
           </li>
         ))}
       </ul>
     </div>
   );
 }
-
-export default Todo;
