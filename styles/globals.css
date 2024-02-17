@@ -47,7 +47,8 @@ label {
   align-items: center;
   justify-items: start;
   column-gap: 10px;
-  padding: 5px;
+  padding: 1rem;
+  
 }
 
 #addTodo {

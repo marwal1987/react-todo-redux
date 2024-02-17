@@ -5,11 +5,14 @@ import {
   removeTodo,
   setTitle,
   setIsEditing,
+  setEditTitle,
 } from "../todoSlice";
 import { SlPlus, SlPencil, SlTrash } from "react-icons/sl";
 
 export default function Todo() {
-  const { todos, title, isEditing } = useSelector((state) => state.todos);
+  const { todos, title, editTitle, editingTodoId } = useSelector(
+    (state) => state.todos
+  );
   const dispatch = useDispatch();
 
   function handleAddTodo() {
@@ -25,12 +28,10 @@ export default function Todo() {
     }
   }
 
-  function handleTitleChange(event) {
-    dispatch(setTitle(event.target.value));
-  }
-
-  function handleToggleEditing() {
-    dispatch(setIsEditing(!isEditing));
+  function handleToggleEditing(todoId) {
+    const todo = todos.find((todo) => todo.id === todoId);
+    dispatch(setEditTitle(todo.title));
+    dispatch(setIsEditing(todoId === editingTodoId ? null : todoId));
   }
 
   function handleChangeTodo(updatedTodo) {
@@ -43,7 +44,7 @@ export default function Todo() {
 
   function handleSave(todo, newTitle) {
     dispatch(updateTodo({ ...todo, title: newTitle }));
-    dispatch(setIsEditing(false));
+    dispatch(setIsEditing(null));
   }
 
   return (
@@ -53,7 +54,7 @@ export default function Todo() {
         <input
           placeholder="Add task"
           value={title}
-          onChange={handleTitleChange}
+          onChange={(e) => dispatch(setTitle(e.target.value))}
         />
         <button onClick={handleAddTodo} style={{ color: "goldenrod" }}>
           <SlPlus />
@@ -70,14 +71,14 @@ export default function Todo() {
                   handleChangeTodo({ ...todo, done: e.target.checked })
                 }
               />
-              {isEditing ? (
+              {editingTodoId === todo.id ? (
                 <>
                   <input
                     type="text"
-                    value={todo.title}
-                    onChange={(e) => handleSave(todo, e.target.value)}
+                    value={editTitle}
+                    onChange={(e) => dispatch(setEditTitle(e.target.value))}
                   />
-                  <button onClick={() => handleSave(todo, todo.title)}>
+                  <button onClick={() => handleSave(todo, editTitle)}>
                     Save
                   </button>
                 </>
@@ -85,7 +86,7 @@ export default function Todo() {
                 <>
                   {todo.title}
                   <button
-                    onClick={handleToggleEditing}
+                    onClick={() => handleToggleEditing(todo.id)}
                     style={{ color: "goldenrod" }}
                   >
                     <SlPencil />
