@@ -15,12 +15,10 @@ const todoSlice = createSlice({
     addTodo: (state, action) => {
       state.todos.push(action.payload);
     },
-    updateTodo: (state, action) => {
+    updateTodoTitle: (state, action) => {
       const { id, title } = action.payload;
       const todoToUpdate = state.todos.find((todo) => todo.id === id);
-      if (todoToUpdate) {
-        todoToUpdate.title = title; // Uppdatera titeln för den specifika uppgiften
-      }
+      todoToUpdate && (todoToUpdate.title = title);
     },
     removeTodo: (state, action) => {
       state.todos = state.todos.filter((todo) => todo.id !== action.payload);
@@ -37,16 +35,22 @@ const todoSlice = createSlice({
     setEditingTodoId: (state, action) => {
       state.editingTodoId = action.payload;
     },
+    toggleTodoDone: (state, action) => {
+      const { id, done } = action.payload;
+      const todoToUpdate = state.todos.find((todo) => todo.id === id);
+      todoToUpdate && (todoToUpdate.done = done);
+    },
   },
 });
 
 export const {
   addTodo,
-  updateTodo,
+  updateTodoTitle,
   removeTodo,
   setTitle,
   setEditTitle,
   setIsEditing,
   setEditingTodoId,
+  toggleTodoDone,
 } = todoSlice.actions;
 export default todoSlice.reducer;

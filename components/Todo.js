@@ -1,11 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
 import {
   addTodo,
-  updateTodo,
+  updateTodoTitle,
   removeTodo,
   setTitle,
   setIsEditing,
   setEditTitle,
+  toggleTodoDone,
 } from "../todoSlice";
 import { SlPlus, SlPencil, SlTrash } from "react-icons/sl";
 
@@ -14,38 +15,6 @@ export default function Todo() {
     (state) => state.todos
   );
   const dispatch = useDispatch();
-
-  function handleAddTodo() {
-    if (title.trim() !== "") {
-      dispatch(
-        addTodo({
-          id: Date.now(),
-          title,
-          done: false,
-        })
-      );
-      dispatch(setTitle(""));
-    }
-  }
-
-  function handleToggleEditing(todoId) {
-    const todo = todos.find((todo) => todo.id === todoId);
-    dispatch(setEditTitle(todo.title));
-    dispatch(setIsEditing(todoId === editingTodoId ? null : todoId));
-  }
-
-  function handleChangeTodo(updatedTodo) {
-    dispatch(updateTodo(updatedTodo));
-  }
-
-  function handleDeleteTodo(todoId) {
-    dispatch(removeTodo(todoId));
-  }
-
-  function handleSave(todo, newTitle) {
-    dispatch(updateTodo({ ...todo, title: newTitle }));
-    dispatch(setIsEditing(null));
-  }
 
   return (
     <div>
@@ -56,19 +25,37 @@ export default function Todo() {
           value={title}
           onChange={(e) => dispatch(setTitle(e.target.value))}
         />
-        <button onClick={handleAddTodo} style={{ color: "goldenrod" }}>
+        <button
+          onClick={() => {
+            if (title.trim() !== "") {
+              dispatch(
+                addTodo({
+                  id: Date.now(),
+                  title,
+                  done: false,
+                })
+              );
+              dispatch(setTitle(""));
+            }
+          }}
+          style={{ color: "goldenrod" }}
+        >
           <SlPlus />
         </button>
       </div>
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
-            <label>
+            <label style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
               <input
                 type="checkbox"
                 checked={todo.done}
                 onChange={(e) =>
-                  handleChangeTodo({ ...todo, done: e.target.checked })
+                  !editingTodoId
+                    ? dispatch(
+                        toggleTodoDone({ id: todo.id, done: e.target.checked })
+                      )
+                    : null
                 }
               />
               {editingTodoId === todo.id ? (
@@ -78,7 +65,12 @@ export default function Todo() {
                     value={editTitle}
                     onChange={(e) => dispatch(setEditTitle(e.target.value))}
                   />
-                  <button onClick={() => handleSave(todo, editTitle)}>
+                  <button
+                    onClick={() => {
+                      dispatch(updateTodoTitle({ ...todo, title: editTitle }));
+                      dispatch(setIsEditing(null));
+                    }}
+                  >
                     Save
                   </button>
                 </>
@@ -86,7 +78,11 @@ export default function Todo() {
                 <>
                   {todo.title}
                   <button
-                    onClick={() => handleToggleEditing(todo.id)}
+                    onClick={() => {
+                      const todoToUpdate = todos.find((t) => t.id === todo.id);
+                      dispatch(setEditTitle(todoToUpdate.title));
+                      dispatch(setIsEditing(todo.id));
+                    }}
                     style={{ color: "goldenrod" }}
                   >
                     <SlPencil />
@@ -94,7 +90,7 @@ export default function Todo() {
                 </>
               )}
               <button
-                onClick={() => handleDeleteTodo(todo.id)}
+                onClick={() => dispatch(removeTodo(todo.id))}
                 style={{ color: "red" }}
               >
                 <SlTrash />
