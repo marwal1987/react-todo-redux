@@ -46,7 +46,9 @@ export default function Todo() {
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
-            <label style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
+            <label
+              style={{ textDecoration: todo.done ? "line-through" : "none" }}
+            >
               <input
                 type="checkbox"
                 checked={todo.done}
